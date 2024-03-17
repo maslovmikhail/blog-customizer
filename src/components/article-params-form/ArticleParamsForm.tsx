@@ -2,7 +2,7 @@ import { ArrowButton } from 'components/arrow-button';
 import { Button } from 'components/button';
 
 import styles from './ArticleParamsForm.module.scss';
-import { SyntheticEvent, useEffect, useRef, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import clsx from 'clsx';
 import {
 	ArticleStateType,
@@ -47,7 +47,7 @@ export const ArticleParamsForm = ({
 		setIsOpenForm(!isOpenForm);
 	};
 
-	const formSubmitHandler = (event: SyntheticEvent) => {
+	const formSubmitHandler = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 		setCurrentArticleState({
 			fontFamilyOption: newFontFamily,
@@ -59,22 +59,24 @@ export const ArticleParamsForm = ({
 	};
 
 	const rootRef = useRef<any>();
-	const handleClick = (event: MouseEvent) => {
-		if (
-			isOpenForm &&
-			rootRef.current &&
-			!rootRef.current.contains(event.target) &&
-			formOpenHandler
-		) {
-			formOpenHandler();
-		}
-	};
+
 	useEffect(() => {
+		if (!isOpenForm) return;
+		const handleClick = (event: MouseEvent) => {
+			if (
+				isOpenForm &&
+				rootRef.current &&
+				!rootRef.current.contains(event.target) &&
+				formOpenHandler
+			) {
+				formOpenHandler();
+			}
+		};
 		window.addEventListener('mousedown', handleClick);
 		return () => {
 			window.removeEventListener('mousedown', handleClick);
 		};
-	});
+	}, [isOpenForm]);
 
 	const resetFormHandler = () => {
 		setCurrentArticleState(defaultArticleState);
